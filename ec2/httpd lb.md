@@ -4,6 +4,8 @@
 yum -y update
 yum install -y httpd docker
 ```
+## Configuration of httpd
+```
 rm -f /etc/httpd/conf.d/welcome.conf
 cat > /etc/httpd/conf.d/lb.conf <<EOF
 ProxyRequests off
@@ -18,11 +20,14 @@ ProxyRequests off
 </Proxy>
 ProxyPass / balancer://mycluster/
 EOF
-
+```
+## Start docker and httpd
+```
 systemctl enable docker
 systemctl start docker
 systemctl enable httpd
 systemctl start httpd
+```
 
 eval $(aws ecr get-login --region us-east-1 --no-include-email)
 image=453500636975.dkr.ecr.us-east-1.amazonaws.com/mario:latest
@@ -30,26 +35,30 @@ image=453500636975.dkr.ecr.us-east-1.amazonaws.com/mario:latest
 docker pull $image
 systemctl enable httpd
 systemctl start httpd
-docker run -p 8080:80 rootapi:v1 &
-docker run -p 8081:80 rootapi:v1 &
-docker run -p 8082:80 rootapi:v1 &
-docker run -p 8083:80 rootapi:v1 &
-docker run -p 8084:80 rootapi:v1 &
-docker run -p 8085:80 rootapi:v1 &
+## bootsrap script
+```
+#!/bin/bash
+docker run -p 8080:80 xx:v1 &
+docker run -p 8081:80 xx:v1 &
+docker run -p 8082:80 xx:v1 &
+docker run -p 8083:80 xx:v1 &
+docker run -p 8084:80 xx:v1 &
+docker run -p 8085:80 xx:v1 &
+```
 
--------------------------------------------------------------------------
-
+## Creation of the Dockerfile
+```
 FROM amazonlinux:latest
-
 EXPOSE 80
 
 RUN yum -y install wget
-RUN wget https://s3.amazonaws.com/ee-assets-dev-us-east-1/modules/gd2015-loadgen/v0.1/server
+RUN wget xxxxx
 RUN chmod +x server
 CMD ./server
 
-docker build -t xxxxxxxxx .
-----------------------------------
+docker build -t xxxxxxxxx:v1 .
+```
+```
 FROM amazonlinux:latest
 EXPOSE 80
 
@@ -59,3 +68,4 @@ COPY ./* /api/
 WORKDIR /api
 RUN pip3 install -r requirements.txt
 CMD python3 main.py
+```
